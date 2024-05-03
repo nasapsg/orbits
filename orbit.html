@@ -1,0 +1,416 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Orbit Viewer</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="jquery-ui.css">
+    <link rel="stylesheet" href="font-awesome.min.css">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap-datetimepicker.css">
+    <link rel="stylesheet" href="bootstrap-toggle.css">
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+
+    <div class="popover-warning fade" id="objectNotFound" style="">
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong><span id="popoverWarningText">Object Not Found!</span></strong>
+        </div>
+    </div>
+
+    <div class="popover-success fade" id="objectLoaded" style="">
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <strong><span id="popoverSuccessText">Object Loaded!</span></strong>
+        </div>
+    </div>
+
+
+    <div class="openNavButton" id="open-sidenav-button">
+        <a href="javascript:void(0)" onclick="openNav()">
+            <i class="fa fa-bars" aria-hidden="true"  onclick="openNav()"></i>
+        </a>
+
+    </div>
+
+    <div id="sidenav" class="sidenav">
+
+        <div id="sidenav_top_main" class="sidenav_top">
+            <a href="javascript:void(0)" class="closeNavButton" onclick="closeNav()">
+                <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+            </a>
+        </div>
+        <div id="sidenav_content_main" class="sidenav_content">
+
+            <div class="dropdown" _data-toggle="tooltip" data-placement="bottom" title="Select Camera Focus">
+                <button class="btn btn-default dropdown-toggle" type="button" id="lookAtDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <span id="lookat-dropdown-label">Look At</span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="lookAtDropdown" id="lookAtDropdownOptions">
+                    <li><a href="javascript:void(0);">SSB</a></li>
+                    <li><a href="javascript:void(0);">Sun</a></li>
+                    <li><a href="javascript:void(0);">Mercury</a></li>
+                    <li><a href="javascript:void(0);">Venus</a></li>
+                    <li><a href="javascript:void(0);">Earth</a></li>
+                    <li><a href="javascript:void(0);">Mars</a></li>
+                    <li><a href="javascript:void(0);">Jupiter</a></li>
+                    <li><a href="javascript:void(0);">Saturn</a></li>
+                    <li><a href="javascript:void(0);">Uranus</a></li>
+                    <li><a href="javascript:void(0);">Neptune</a></li>
+                </ul>
+            </div>
+
+            <div class="dropdown" _data-toggle="tooltip" data-placement="bottom" title="Select Camera Orientation">
+                <button class="btn btn-default dropdown-toggle" type="button" id="lookFromDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <span id="lookfrom-dropdown-label">Look From</span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="lookFromDropdown" id="lookFromDropdownOptions">
+                    <li><a href="javascript:void(0);" id="view-from-default">Default</a></li>
+                    <li><a href="javascript:void(0);" id="view-from-above">Above</a></li>
+                    <li><a href="javascript:void(0);" id="view-from-ecliptic">Ecliptic</a></li>
+                    <li><a href="javascript:void(0);" id="view-from-earth">Earth</a></li>
+                </ul>
+            </div>
+
+
+            <hr class="sidenav-hr"/>
+
+            <a href="javascript:void(0);"  class="sidenav-link" id="sidenav-settings-link" >Settings</a>
+
+            <hr class="sidenav-hr" style="display:none;"/>
+
+            <a href="javascript:void(0);" class="sidenav-link" data-toggle="modal" data-target="#linkModal" style="display:none;">Permalink</a>
+            <a href="javascript:void(0);" class="sidenav-link" data-toggle="modal" data-target="#helpModal">Help</a>
+            <a href="javascript:void(0);" class="sidenav-link" data-toggle="modal" data-target="#aboutModal">About</a>
+
+        </div>
+        <div id="sidenav_content_settings" class="sidenav_content" style="display:none;">
+            <a href="javascript:void(0)" class="sidenav-submenu-close" id="close-settings-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
+
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" checked data-toggle="toggle" id="planet-labels-toggle"  data-size="mini">
+                    Planet Labels
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" checked data-toggle="toggle" id="date-label-toggle"  data-size="mini">
+                    Date Label
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" checked data-toggle="toggle" id="ecliptic-grid-toggle"  data-size="mini">
+                    Ecliptic Grid
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" checked data-toggle="toggle" id="ecliptic-axis-toggle"  data-size="mini">
+                    Ecliptic Axes
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" checked data-toggle="toggle" id="distance-label-toggle"  data-size="mini">
+                    Distance Display
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" checked data-toggle="toggle" id="show-controls-toggle"  data-size="mini">
+                    Viewer Controls
+                </label>
+            </div>
+            <div style="padding-left: 20px !important;">
+              <label style="padding-bottom: 5px !important; color: white !important; font-family: 'Roboto', sans-serif !important; font-weight: 400 !important;">Label Font Size:</label><&nbsp;><input id="font_input" type="number" name="someid" style="width: 4em;"/>
+            </div>
+            <div id="system-options-outter-container">
+
+            </div>
+
+        </div>
+        <div id="sidenav_bottom_main" class="sidenav_bottom">
+        </div>
+    </div>
+
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Help</h4>
+                </div>
+                <div class="modal-body">
+
+<h3>Limitations</h3>
+<p>
+  The position of the small body is computed using so-called two-body equations: only the
+  gravitational force of the Sun is considered in the viewer. If the small body makes
+  a close approach to the Earth or a planet, its position as shown in this viewer may
+  become inaccurate. You are especially cautioned against using this viewer to make
+  predictions of the small body's position a long time in the future or past.
+</p>
+<p>
+  Accurate positions of small bodies can be obtained from the
+  <a href="https://ssd.jpl.nasa.gov/?horizons" target="_blank">Horizons</a>
+  ephemeris system which uses a numerically integrated high fidelity model which
+  includes gravitational perturbations by the Sun, all the planets, and some of the
+  largest asteroids.
+</p>
+<p>
+  The orbit viewer is limited to dates between 1600-01-01 and 2200-01-01.
+</p>
+
+<h3>Orbit Paths</h3>
+
+<p>
+  Orbit paths are rendered such that the portion of the orbit above the ecliptic plane
+  is shown with a heavy line weight and the portion below is shown with a light line weight.
+</p>
+<p>
+  When zoomed in extremely close to a planet or moon, it may appear slightly off its orbit path.
+  This is due to the fact that the orbit path is approximated using a series of
+  straight line segments.
+</p>
+<p>
+  Hyperbolic and parabolic orbit paths are only rendered out to about 80 au from the sun.
+</p>
+
+<h3>View Selection</h3>
+
+<p>The default view is an oblique perspective of the ecliptic plane.
+You can select a pre-defined view from the "Look from:" menu.</p>
+<ul>
+  <li>Default - oblique perspective of the ecliptic plane</li>
+  <li>Above - view from directly above the ecliptic plane</li>
+  <li>Ecliptic - view from the edge of the ecliptic plane</li>
+  <li>Earth - view from Earth</li>
+</ul>
+
+<p>
+In all cases above, the views remain centered on the currently selected "Look at" object:
+the solar-system barycenter (SSB) by default.
+To change the "Look at" object, you can either select it from the "Look At" pulldown menu
+or by clicking on the object in the viewer.
+</p>
+
+<h4>Zoom</h4>
+<p>
+To zoom in or out, use the mouse wheel
+or the appropriate zoom "gesture" on your trackpad or mobile device.
+</p>
+
+<h4>Rotation</h4>
+
+<p>
+To rotate the view around the axis normal to the ecliptic plane,
+drag the mouse left or right within the window, or use the keyboard's left/right arrows.
+To rotate around the screen's horizontal axis,
+drag the  mouse up or down within the window, or use the keyboard's up/down arrows.
+</p>
+
+<h4>Customizing the Display</h4>
+
+<p>
+There are several controls within the "Settings" menu that allow you to customize
+the display.
+The top few controls are general (not specific to any particular object).
+</p>
+
+<ul>
+  <li><b>Planet Labels</b> - display the orbits of all objects</li>
+  <li><b>Date Label</b> - display the selected date in the upper right corner</li>
+  <li><b>Ecliptic Grid</b> - display the ecliptic plane grid lines</li>
+  <li><b>Ecliptic Axes</b> - display the ecliptic plane axes</li>
+  <li><b>Distance Display</b> - display the nominal distance between the selected small-body and Earth (and Sun)</li>
+  <li><b>Viewer Controls</b> - show the primary animation controls in the upper right corner</li>
+</ul>
+
+<p>
+The next group of controls are for customizing the display of specific objects.
+There is a top-level checkbox for each object which controls all content related to that object.
+Then there are the following sub-level controls:
+</p>
+
+<ul>
+  <li><b>Orbit</b> - display the object's orbit</li>
+  <li><b>Label</b> - display the object's name</li>
+  <li><b>Moon(s)</b> - display the object's moon(s) and their orbits, if the object has any moons</li>
+  <li><b>Drop Lines</b> - display lines which connect the small-body's orbit to the ecliptic plane, perpendicular to the ecliptic plane (<i>only for the small body</i>)</li>
+</ul>
+
+<h4>Full Screen</h4>
+
+<p>
+To enter full-screen mode, click on the expansion icon
+<i class="fa fa-arrows-alt" aria-hidden="true"></i>.
+To exit full-screen, press the ESC key.
+</p>
+
+<h3>Viewer Controls</h3>
+
+<p>
+The viewer controls are presented in four rows:
+"motion controls", "step size", "date selector", and "extra controls".
+</p>
+
+<h4>motion controls <img src="img/controls.png" alt="motion controls" /></h4>
+<ul class="fa-ul">
+  <li>
+    <i class="fa-li fa fa-backward" aria-hidden="true"></i>
+    run animation backward in time
+  </li>
+  <li>
+    <i class="fa-li fa fa-step-backward" aria-hidden="true"></i>
+    single-step animation backward in time
+  </li>
+  <li>
+    <i class="fa-li fa fa-stop" aria-hidden="true"></i>
+    stop the running animation
+  </li>
+  <li>
+    <i class="fa-li fa fa-step-forward" aria-hidden="true"></i>
+    single-step the animation forward in time
+  </li>
+  <li>
+    <i class="fa-li fa fa-forward" aria-hidden="true"></i>
+    run the animation forward in time
+  </li>
+</ul>
+
+<h4>step size <img src="img/interval.png" alt="interval control" /></h4>
+<p>
+  Select from various time-step intervals from 1-hour to 1-year.
+</p>
+
+<h4>date selector <img src="img/datetime.png" alt="date/time controls" /></h4>
+<p>
+  Select the <span class="glyphicon glyphicon-time"></span> button to display a calendar-date picker.
+  Or, use the date/time input box to manually enter a specific date/time.
+</p>
+
+<h4>extra controls <img src="img/extras.png" alt="extra controls" /></h4>
+<ul class="fa-ul">
+  <li><i class="fa-li fa fa-arrows-alt" aria-hidden="true"></i>
+    full-screen selector (use ESC-key to exit)
+  </li>
+  <li><i class="fa-li fa fa-desktop" aria-hidden="true"></i>
+    capture a snapshot of the screen, without menus or controls
+  </li>
+</ul>
+
+<h3>Coordinate System</h3>
+<p>
+  The coordinate system uses the J2000 ecliptic as the reference plane and
+  places the origin at the solar system barycenter.
+  The horizontal axis is directed toward the J2000 vernal equinox, while the vertical axis
+  is normal to the J2000 ecliptic plane.
+  The positive direction of each axis is indicated by a brighter line.
+</p>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">About</h4>
+                </div>
+                <div class="modal-body">
+                    <p>The orbit viewer was initially developed at JPL in 2018 by Kevin Gill
+with contributions from Paul Chodas, Javier Roa, and Alan Chamberlin. It was further
+updated, some orbital parameters improved, and further containerized for integration into PSG by Geronimo Villanueva at GSFC.
+The module is written in JavaScript, and it makes use of WebGL via the open-source <code>three.js</code> package.</p>
+                    <p>The orbital calculations implement 2-body methods, and hence <b>should not be used</b>
+                      for determining accurate long-term trajectories (over several years or decades) or planetary encounter circumstances. For accurate long-term ephemerides, please instead use the
+<a href="https://ssd.jpl.nasa.gov/?horizons" target="_blank">Horizons system</a>.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="floating_controls">
+
+            <div class="btn-group floating-button-controls" role="group" aria-label="...">
+                <button type="button" class="btn btn-default " id="floating-sim-play-backward" data-toggle="tooltip" data-placement="bottom" title="Play Backward"><i class="fa fa-backward" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-default " id="floating-sim-step-backward" data-toggle="tooltip" data-placement="bottom" title="Step Backward"><i class="fa fa-step-backward" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-default " id="floating-sim-stop" data-toggle="tooltip" data-placement="bottom" title="Stop"><i class="fa fa-stop" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-default " id="floating-sim-step-forward" data-toggle="tooltip" data-placement="bottom" title="Step Forward"><i class="fa fa-step-forward" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-default " id="floating-sim-play-forward" data-toggle="tooltip" data-placement="bottom" title="Play Forward"><i class="fa fa-forward" aria-hidden="true"></i></button>
+            </div>
+
+
+                <div class="interval-and-date-container">
+                    <div class="dropdown interval-dropdown"  data-toggle="tooltip" data-placement="left" title="Animation Step Interval">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="intervalDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            <span id="interval-label">Interval</span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="intervalDropdown" id="intervalDropdownOptions">
+                            <li><a href="javascript:void(0);">1 Hour</a></li>
+                            <li><a href="javascript:void(0);">6 Hours</a></li>
+                            <li><a href="javascript:void(0);">1 Day</a></li>
+                            <li><a href="javascript:void(0);">3 Days</a></li>
+                            <li><a href="javascript:void(0);">1 Week</a></li>
+                            <li><a href="javascript:void(0);">10 Days</a></li>
+                            <li><a href="javascript:void(0);">1 Month</a></li>
+                            <li><a href="javascript:void(0);">3 Months</a></li>
+                            <li><a href="javascript:void(0);">6 Months</a></li>
+                            <li><a href="javascript:void(0);">1 Year</a></li>
+                        </ul>
+                    </div>
+
+                    <button type="button" class="btn btn-default " id="floating-datetime-show" data-toggle="popover" title="Select Date & Time" data-html="true" data-placement="bottom" title="Select Date & Time"><i class="glyphicon glyphicon-time" aria-hidden="true"></i></button>
+                </div>
+
+
+        <div class="view-control-button-container">
+            <div class="btn-group floating-button-controls " role="group" aria-label="...">
+                <button type="button" class="btn btn-default " id="floating-fullscreen" data-toggle="tooltip" data-placement="bottom" title="Enter Fullscreen"><i class="fa fa-arrows-alt" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-default " id="floating-screenshot" data-toggle="tooltip" data-placement="bottom" title="Capture Screenshot"><i class="fa fa-desktop" aria-hidden="true"></i></button>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div id="block_view" class="blocking_div">
+    </div>
+
+    <div id="no_webgl" class="blocking_div">
+        <div class="notice-text">
+            It appears that your browser does not support WebGL. Please check your configuration or download a WebGL-compatible browser
+        </div>
+    </div>
+
+    <script src="majorbodies.json"></script>
+    <script src="include.js"></script>
+    <script src="main.js"></script>
+    <script src="ui.js"></script>
+</body>
+</html>
